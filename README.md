@@ -2,11 +2,7 @@
 
 A tmux setup for AI-assisted development. Status bar with live system stats and rate limits for Claude Code and/or Codex — whatever you use.
 
-```
- main │ 1:zsh  2:claude                    Andres's Mac │ macOS 15.4 │ CPU  12% │ RAM 22.7/36.0G │ GPU M3 Max  7% 143mW │ Mar 13 19:30
- Max Claude │ 5h 3% ░░░░░░░░ (4h54m) │ Wk 24% █░░░░░░░ (Mar 20 6d13h)
- Plus Codex │ 5h 20% █░░░░░░░ (2h07m) │ Wk 23% █░░░░░░░ (Mar 20 6d04h)
-```
+![tmux status bar](screenshot.png)
 
 Only use Claude? You get system stats + Claude limits. Only Codex? Same idea. Both? All three lines. The scripts gracefully show "no auth" if a service isn't configured — nothing breaks.
 
