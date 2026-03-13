@@ -1,6 +1,6 @@
 # claude-tmux
 
-A tmux setup for AI-assisted development. 3-line status bar with live system stats, Claude Code rate limits, and Codex rate limits — all visible at a glance while you work.
+A tmux setup for AI-assisted development. Status bar with live system stats and rate limits for Claude Code and/or Codex — whatever you use.
 
 ```
  main │ 1:zsh  2:claude                    Andres's Mac │ macOS 15.4 │ CPU  12% │ RAM 22.7/36.0G │ GPU M3 Max  7% 143mW │ Mar 13 19:30
@@ -8,45 +8,31 @@ A tmux setup for AI-assisted development. 3-line status bar with live system sta
  Plus Codex │ 5h 20% █░░░░░░░ (2h07m) │ Wk 23% █░░░░░░░ (Mar 20 6d04h)
 ```
 
-This is a [Claude Code skill](https://docs.anthropic.com/en/docs/claude-code), not a traditional plugin. You install it, Claude sets everything up conversationally, and then you modify it to your taste — change colors, swap out status lines, add a battery indicator, whatever. The config files are yours.
+Only use Claude? You get system stats + Claude limits. Only Codex? Same idea. Both? All three lines. The scripts gracefully show "no auth" if a service isn't configured — nothing breaks.
 
-## Install
+There's nothing to install. This repo is a reference — browse the scripts, see how the APIs work, and then tell Claude Code to build yours. Point it here in a session and describe what you want:
 
-Clone into your Claude Code skills directory:
+> *"Set up my tmux with a status bar showing Claude and Codex rate limits. Use this as a reference: https://github.com/affromero/claude-tmux"*
 
-```bash
-git clone https://github.com/andresromero/claude-tmux.git ~/.claude/skills/setup-tmux
-```
+Claude reads the repo, reads your system, and writes a setup tailored to your machine — your terminal, your GPU, your subscriptions. The result is a [Claude Code skill](https://docs.anthropic.com/en/docs/claude-code) that lives in your `~/.claude/skills/` directory, fully yours to modify however you like. Change the colors, drop a status line, add a battery indicator, whatever.
 
-Then tell Claude to run it:
+Run `/setup-tmux` again anytime to update. Or just edit the files directly — they're just bash scripts and a tmux config.
 
-```
-claude "/setup-tmux"
-```
+### What gets created
 
-That's it. Claude reads your system, writes the config, installs plugins, deploys the status scripts, configures your terminal's Meta key, and reloads tmux. Run it again anytime to update.
-
-If you already have a skills directory and want to keep things tidy, add it as a submodule of your dotfiles or skills repo instead:
-
-```bash
-cd ~/.claude/skills
-git submodule add https://github.com/andresromero/claude-tmux.git setup-tmux
-```
-
-### What it does
-
-1. Writes `~/.tmux.conf` (shows diff and asks before overwriting)
-2. Installs TPM + plugins (tmux-resurrect, tmux-continuum)
-3. Deploys 3 status bar scripts to `~/.tmux/scripts/`
-4. Configures Option-as-Meta for your terminal (Ghostty/iTerm2/VS Code/Cursor)
-5. Enables Claude Code agent teams (tmux teammate mode)
-6. Reloads the running tmux server
+1. `~/.tmux.conf` — full config (Claude shows a diff before overwriting)
+2. `~/.tmux/scripts/sys-stats.sh` — system stats for the status bar
+3. `~/.tmux/scripts/claude-limits.sh` — Claude Code rate limit monitor
+4. `~/.tmux/scripts/codex-limits.sh` — Codex rate limit monitor
+5. TPM + plugins (tmux-resurrect, tmux-continuum)
+6. Terminal Meta key config (Ghostty/iTerm2/VS Code/Cursor)
+7. Claude Code agent teams enabled
 
 ### Prerequisites
 
 - tmux 3.4+ (for multi-line status bar)
-- `python3` and `curl` (for AI limit scripts)
-- Claude Code and/or Codex CLI logged in (for rate limit data)
+- `python3` and `curl` (for the limit scripts)
+- Claude Code logged in, Codex CLI logged in, or both — each limit line works independently
 
 ## Features
 
@@ -189,44 +175,11 @@ Returns `rate_limit.primary_window` (5h), `rate_limit.secondary_window` (weekly)
 
 Token lives in `~/.codex/auth.json` → `tokens.access_token`.
 
-## Make It Yours
+## Why Not a Plugin?
 
-This isn't a rigid plugin you install and forget. It's a skill — a set of config files and scripts that Claude deploys and you own. The files live in `~/.claude/skills/setup-tmux/` (canonical) and get deployed to `~/.tmux.conf` and `~/.tmux/scripts/`.
+Traditional tmux plugins (TPM) install scripts and set options. They can't detect your terminal, configure Meta keys, set up GPU monitoring, or adapt to SSH vs local. A Claude Code skill does all of that conversationally — it reads your machine and asks when it's unsure.
 
-Want to change something? Just ask Claude:
-
-- *"change the status bar colors to dracula theme"*
-- *"add a battery indicator to line 0"*
-- *"remove the Codex line, I only use Claude"*
-- *"make the pane borders blue instead of amber"*
-
-Or edit the files directly — they're just bash scripts and a tmux config. Edit `~/.tmux/scripts/` for quick tweaks, or edit the canonical sources in `~/.claude/skills/setup-tmux/` so your changes persist across `/setup-tmux` runs.
-
-## Files
-
-```
-~/.tmux.conf                          # Main config (deployed from skill)
-~/.tmux/scripts/
-├── sys-stats.sh                      # System stats (CPU, RAM, GPU)
-├── claude-limits.sh                  # Claude Code 5h + weekly limits
-└── codex-limits.sh                   # Codex 5h + weekly limits + credits
-~/.tmux/plugins/
-├── tpm/                              # Plugin manager
-├── tmux-resurrect/                   # Session save/restore
-└── tmux-continuum/                   # Auto-save + auto-restore
-```
-
-## Why a Skill Instead of a Plugin?
-
-Traditional tmux plugins (TPM) can install shell scripts and set options, but they can't:
-
-- Detect your terminal and configure Meta key settings
-- Show you a diff before overwriting your config
-- Set up macOS sudoers for GPU stats
-- Enable Claude Code agent teams
-- Adapt to your specific machine (SSH vs local, Ghostty vs iTerm2, Apple Silicon vs NVIDIA)
-
-A Claude Code skill handles all of this conversationally. Run `/setup-tmux` on a fresh EC2 instance or your local Mac — it figures out what's needed and asks when it's unsure.
+More importantly: you're not locked into someone else's config. The skill generates files that are entirely yours. Edit them, fork the approach, ask Claude to rewrite the whole thing in a different style. There's no upstream to stay in sync with.
 
 ## Credits
 
